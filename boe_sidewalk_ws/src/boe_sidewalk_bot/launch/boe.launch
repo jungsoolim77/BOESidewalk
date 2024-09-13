@@ -1,0 +1,5 @@
+<launch>
+	<node pkg="boe_sidewalk_bot" type="readData.py" name="read_data_node"/>
+	<node pkg="boe_sidewalk_bot" type="saveData.py" name="save_data_node"/>
+	<node pkg="boe_sidewalk_bot" type="util.py" name="utility_node"/>
+</launch>
