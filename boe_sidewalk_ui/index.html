@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+
+		<title>Boe Sidewalkbot UI</title>
+
+		<meta name="application-name" content="BOE Sidewalkbot UI">
+		<meta name="apple-mobile-web-app-title" content="BOE Sidewalkbot UI">
+
+		<meta name="theme-color" content="#000000">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+
+		<!-- icons -->
+		<link rel="shortcut icon" href="./img/crest_LA.png">
+		<link rel="apple-touch-icon-precomposed" href="./img/logo.jpg">
+		<link rel="shortcut icon" href="./img/arrowkeys.png">
+		<link rel="manifest" href="./manifest.webmanifest">
+		<link rel="battery" href="./img/battery.png">
+
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" href="css/bootstrap-slider.min.css" />
+		<link rel="stylesheet" href="css/font.css" />
+
+		<script src="./js/jquery.min.js"></script>
+		<script src="./js/bootstrap.min.js"></script>
+		<script src="./js/bootstrap-slider.min.js"></script>
+		<script src="./js/roslib.min.js"></script>
+		<script src="./js/nipplejs.js"></script>
+
+		<script src="./js/leo.js"></script>
+		<script src="./js/fullscreen.js"></script>
+		<script src="./js/servoblock.js"></script>
+
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+	</head>
+
+	<body style="background-color:#e5eeff;">
+
+
+	<nav class="navbar navbar-expand-md" style="background-color:#598027;">
+		<div class="container-fluid">
+			
+			<div class="col-2 navbar-brand" href="#">
+				<img class="rounded" src="img/engineeringLogo.png" alt="Logo" style="width: 116px; height: 70px;"/>
+			</div>
+
+			<div class="col-2" >
+				<div id="batteryID" class="center-fit" style="width: 70px; height: 40px; font-size: x-large; color: aliceblue; text-align: center;">  
+					<i>Voltage: 0V</i>
+				</div>
+			</div>	
+
+			<div class="col-1 text-center">
+				<button type="button" id="fullScreenButton" style="width: 45px; height: 45px;" onclick="fullScreen()">
+					<img class="rounded img-fluid" src="img/nav-bar-fullscreen.svg" alt="FullScreen" style="width: 25px; height: 25px;"/>
+				</button>
+			</div>
+
+			<div class="navbar-collapse ml-auto" id="collapsibleNavbar">
+				<ul class="navbar-nav ml-auto">
+				<li class="nav-item ml-auto">
+					<button type="button" style="width: 50px; height: 50px;" id="startButton" class="btn btn-success btn-sm custom-btn mt-2 ml-3" onclick="setStart()"><img src="./img/play-fill.svg"></button>
+				</li>
+				<li class="nav-item ml-auto">
+					<button type="button" style="width: 50px; height: 50px;" id="stopButton" class="btn btn-info btn-sm custom-btn mt-2 ml-3" onclick="setStop()"><img src="./img/stop-circle.svg"></button>
+				</li>
+				<li class="nav-item ml-auto">
+					<input type="text" class="btn btn-primary btn-sm custom-btn mt-2 ml-3" id = "sid" placeholder="Sidewalk ID" >
+				</li>
+				<li class="nav-item ml-auto">
+					<button type="button" class="btn btn-primary btn-sm custom-btn mt-2 ml-3" onclick="setSID()">Set SID</button>
+				</li>
+				<li class="nav-item ml-auto">
+					<button type="button" style="width: 50px; height: 50px;" class="btn btn-warning btn-sm custom-btn mt-2 ml-3" onclick="systemReboot()"
+						data-bs-toggle="tooltip" data-bs-placement="bottom"
+						data-bs-title="System Reboot">
+						<img src="./img/arrow-clockwise.svg"/>
+					</button>
+				</li>
+				<!-- <li class="nav-item ml-auto">
+					<button type="button" class="btn btn-warning btn-sm custom-btn mt-2 ml-3" onclick="streamReboot()">Reboot stream</button>
+				</li> -->
+				<li class="nav-item ml-auto">
+					<button type="button" style="width: 50px; height: 50px;" class="btn btn-danger btn-sm custom-btn mt-2 ml-3"  onclick="turnOff()"><img src="./img/power.svg"></button>
+				</li>
+				</ul>
+			</div>
+		</div>
+	</nav> 
+
+	<!-- ALERTS here, does not show up initially. DOM elements created in displayAlert() -->
+	<div class='container-fluid'>
+		<div id="alertRow" class='row'>
+			<div id="alerts" class='col-4'>
+				
+				</div>
+			</div>
+		</div>	
+	</div>
+
+	<div class="row d-none d-md-block" style="margin: 0px 15px;">
+			<div id="servoB" style="width: 100%; height: 350px; background-color:#05a59d;">
+				<!--To make text area black text on white background just remove stylings -RM -->
+				<textarea readonly id="rawdata" style="width: 100%; height: 100%; resize: none; background-color: black; color: white;"></textarea>
+			</div>
+	</div>
+
+	<div class="row"  style=padding-top:2.5%;>
+		<div class="col md-2 d-none d-md-block" style="text-align: center;">
+			<!--Speed Controls-->
+			<label for="speed-select" style="font-size: xx-large;">Speed:</label>
+			<select name="speeds" id="speed-select" style="height: 50px; font-size: x-large;" onchange="setSpeed()" >
+				<option value="0.02">0.02 m/s</option>
+				<option value="0.04">0.04 m/s</option>
+				<option value="0.06">0.06 m/s</option>
+				<option value="0.08">0.08 m/s</option>
+				<option value="0.10">0.10 m/s</option>
+			</select>
+		</div>
+		<div class="col-4 md-2 d-none d-md-block">
+			<table style="margin: 0 auto;">
+				<thead>
+					<th></th>
+					<th>
+						<button class="rounded btn-secondary" alt="Forward" style="width: 70px; height: 70px;" onclick="forward()">
+							<img src="./img/arrow-up.svg" width="40" height="40" />
+						</button>
+					</th>
+					<th></th>
+				</thead>
+				<tbody>
+					<tr>
+					<th>
+						<button class="rounded btn-secondary" alt="Left" style="width: 70px; height: 70px;" onclick="left()">
+							<img src="./img/arrow-left.svg" width="40" height="40">
+						</button>
+					</th>
+					<th>
+						<button class="rounded btn-secondary" alt="Stop" style="width: 70px; height: 70px;" onclick="stopRover()">
+							<img src="./img/sign-stop-fill.svg" width="40" height="40">
+						</button>
+					</th>
+					<th>
+					<th>
+						<button class="rounded btn-secondary" alt="Right" style="width: 70px; height: 70px;" onclick="right()">
+							<img src="./img/arrow-right.svg" width="40" height="40">
+						</button>
+					</th>
+					</th>
+					</tr>
+					<tr>
+					<td></td>
+					<th>
+						<button class="rounded btn-secondary" alt="Backward" style="width: 70px; height: 70px;" onclick="backward()">
+							<img src="./img/arrow-down.svg" width="40" height="40">
+						</button>
+					</th>	
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="col-4 md-2 d-none d-md-block">
+			<!-- Joystick Controls-->
+			<div id="joystick"></div>
+		</div>
+
+	</div>
+
+	<!-- FOR VIDEO -->
+	<div class="justify-content-center" style="margin-top: -70px; min-width: 100%; min-height: 100%; ">
+		<!-- <img src="" class="p-1 center-fit" alt="" id="video" style="background-size: cover"></img> -->
+	<div>
+
+
+
+	
+	</body>
+
+</html>
