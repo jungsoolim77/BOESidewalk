@@ -12,6 +12,8 @@ var startIntervalID;
 var sidPub;
 var sidVal;
 var sidIntervalID;
+var isSafeSub;
+var isSafeVal = 1;
 
 var systemRebootPub;
 var systemShutdownPub;
@@ -84,6 +86,15 @@ function initROS() {
     });
     batterySub.subscribe(batteryCallback);
 
+    isSafeSub = new ROSLIB.Topic({
+        ros : ros,
+        name : '/is_safe',
+        messageType : 'std_msgs/Int16',
+        queue_length: 1
+    })
+
+    isSafeSub.subscribe(isSafeCallback);
+
     raw_dataSub = new ROSLIB.Topic({
         ros : ros,
         name : '/rover_data',
@@ -91,6 +102,7 @@ function initROS() {
         queue_length: 1
     });
     raw_dataSub.subscribe(rawDataCallback);
+
 
     startPub = new ROSLIB.Topic({
         ros: ros,
@@ -174,7 +186,7 @@ function batteryCallback(message) {
         vol = 100.0
     }
     // document.getElementById('batteryID').innerHTML = 'Voltage: ' + message.voltage.toPrecision(4) + 'V';
-    document.getElementById('batteryID').innerHTML = 'Voltage: ' + vol.toFixed(2) + 'V';
+    document.getElementById('batteryID').innerHTML = 'Voltage: ' + vol.toFixed(2) + '% V';
 }
 
 function rawDataCallback(message) {
@@ -189,7 +201,14 @@ function rawDataCallback(message) {
     document.getElementById('rawdata').value = raw_data;
 }
 
+function isSafeCallback(message){
+    isSafeVal = message.data;
+}
+
 function publishTwist() {
+    if(isSaveVal < 1 ){
+        twist.linear.x = twist.linear.x * (0.5);
+    }
     cmdVelPub.publish(twist);
 }
 
@@ -386,3 +405,5 @@ window.onload = function () {
 
     window.addEventListener("beforeunload", () => shutdown());
 }
+
+
